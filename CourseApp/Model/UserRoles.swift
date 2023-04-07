@@ -7,7 +7,9 @@
 
 import SwiftUI
 
-enum UserRole: String {
+enum UserRole: String, CaseIterable, Identifiable {
     case manager = "manager"
-    case employee = "executer"
+    case executer = "executer"
+
+    var id: String { rawValue }
 }

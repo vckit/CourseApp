@@ -8,8 +8,39 @@
 import SwiftUI
 
 struct ManagerView: View {
+    @State private var showAddUserView = false
+    
     var body: some View {
-        Text("Hello, Manager!")
+        NavigationView {
+            VStack(spacing: 16) {
+                Button(action: {
+                    // Add Task action
+                }) {
+                    Text("Add Task")
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(Color.blue)
+                        .foregroundColor(.white)
+                        .cornerRadius(8)
+                }
+                
+                Button(action: {
+                    showAddUserView = true
+                }) {
+                    Text("Add User")
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(Color.blue)
+                        .foregroundColor(.white)
+                        .cornerRadius(8)
+                }
+                .sheet(isPresented: $showAddUserView) {
+                    AddUserView()
+                }
+            }
+            .padding()
+            .navigationTitle("Manager View")
+        }
     }
 }
 

@@ -17,7 +17,7 @@ struct ContentView: View {
                     switch userRole {
                     case .manager:
                         ManagerView()
-                    case .employee:
+                    case .executer:
                         EmployeeView()
                     }
                 } else {

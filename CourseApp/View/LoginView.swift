@@ -17,6 +17,13 @@ struct LoginView: View {
     
     var body: some View {
         VStack {
+            Image(systemName: "lock")
+                .resizable()
+                .scaledToFit()
+                .frame(width: 150, height: 150)
+                .padding(.bottom, 24)
+
+            
             TextField("Email", text: $email)
                 .autocapitalization(.none)
                 .textContentType(.emailAddress)
@@ -40,9 +47,9 @@ struct LoginView: View {
                 }
             }
             .padding()
-            .background(Color.blue)
+            .background(Color.black)
             .foregroundColor(.white)
-            .cornerRadius(8)
+            .cornerRadius(10)
         }
         .padding()
         .alert(isPresented: $showErrorAlert) {
