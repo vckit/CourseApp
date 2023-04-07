@@ -14,12 +14,14 @@ struct CourseAppApp: App {
     
     init() {
         FirebaseApp.configure()
+        //updateOverdueTasks()
     }
     
     var body: some Scene {
         WindowGroup {
             ContentView()
                 .environmentObject(AuthService())
+                //.environmentObject(TaskService)
         }
     }
 }

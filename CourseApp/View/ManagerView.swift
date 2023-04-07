@@ -10,14 +10,12 @@ import SwiftUI
 struct ManagerView: View {
     @State private var showAddUserView = false
     
-
+    
     var body: some View {
         NavigationView {
             VStack(spacing: 16) {
-                Button(action: {
-                    // Add Task action
-                }) {
-                    Text("Add Task")
+                NavigationLink(destination: TaskListView()) {
+                    Text("Tasks")
                         .frame(maxWidth: .infinity)
                         .padding()
                         .background(Color.blue)
@@ -40,7 +38,7 @@ struct ManagerView: View {
                         showAddUserView = false
                     })
                 }
-
+                
             }
             .padding()
             .navigationTitle("Manager View")
