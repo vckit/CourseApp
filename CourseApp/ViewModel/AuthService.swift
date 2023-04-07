@@ -12,7 +12,7 @@ import FirebaseFirestore
 class AuthService: ObservableObject {
     @Published var currentUserRole: UserRole?
     private let db = Firestore.firestore()
-
+    
     func signIn(email: String, password: String, completion: @escaping (Result<Void, Error>) -> Void) {
         Auth.auth().signIn(withEmail: email, password: password) { [weak self] result, error in
             if let error = error {
@@ -32,8 +32,8 @@ class AuthService: ObservableObject {
             }
         }
     }
-
-
+    
+    
     func fetchUserRole(uid: String, completion: @escaping (UserRole?) -> Void) {
         db.collection("users").document(uid).addSnapshotListener { documentSnapshot, error in
             if let error = error {
@@ -71,36 +71,44 @@ class AuthService: ObservableObject {
     }
     
     func createUser(email: String, password: String, role: UserRole, completion: @escaping (Result<Void, Error>) -> Void) {
-            Auth.auth().createUser(withEmail: email, password: password) { [weak self] result, error in
+        Auth.auth().createUser(withEmail: email, password: password) { [weak self] result, error in
+            if let error = error {
+                completion(.failure(error))
+                return
+            }
+            
+            guard let uid = result?.user.uid else {
+                let error = NSError(domain: "", code: -1, userInfo: [NSLocalizedDescriptionKey: "Missing user ID"])
+                completion(.failure(error))
+                return
+            }
+            
+            let userData: [String: Any] = [
+                "role": role.rawValue
+            ]
+            
+            self?.db.collection("users").document(uid).setData(userData) { error in
                 if let error = error {
                     completion(.failure(error))
-                    return
-                }
-                
-                guard let uid = result?.user.uid else {
-                    let error = NSError(domain: "", code: -1, userInfo: [NSLocalizedDescriptionKey: "Missing user ID"])
-                    completion(.failure(error))
-                    return
-                }
-                
-                self?.db.collection("users").document(uid).setData(["role": role.rawValue]) { error in
-                    if let error = error {
-                        completion(.failure(error))
-                    } else {
-                        completion(.success(()))
-                    }
+                } else {
+                    self?.currentUserRole = role
+                    completion(.success(()))
                 }
             }
         }
-    
-    func signOut() {
-        do {
-            try Auth.auth().signOut()
-            currentUserRole = nil
-        } catch let error {
-            print("Error signing out: \(error.localizedDescription)")
+        
+        
+        
+        
+        func signOut() {
+            do {
+                try Auth.auth().signOut()
+                currentUserRole = nil
+            } catch let error {
+                print("Error signing out: \(error.localizedDescription)")
+            }
         }
+        
     }
-
+    
 }
-

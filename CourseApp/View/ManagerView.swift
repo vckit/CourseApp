@@ -10,6 +10,7 @@ import SwiftUI
 struct ManagerView: View {
     @State private var showAddUserView = false
     
+
     var body: some View {
         NavigationView {
             VStack(spacing: 16) {
@@ -35,8 +36,11 @@ struct ManagerView: View {
                         .cornerRadius(8)
                 }
                 .sheet(isPresented: $showAddUserView) {
-                    AddUserView()
+                    AddUserView(onUserCreated: {
+                        showAddUserView = false
+                    })
                 }
+
             }
             .padding()
             .navigationTitle("Manager View")

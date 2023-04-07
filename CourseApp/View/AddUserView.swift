@@ -14,6 +14,7 @@ struct AddUserView: View {
     @State private var showErrorAlert = false
     @State private var errorMessage = ""
     @EnvironmentObject var authService: AuthService
+    var onUserCreated: (() -> Void)?
     @Environment(\.presentationMode) var presentationMode
     
     var body: some View {
@@ -35,7 +36,7 @@ struct AddUserView: View {
                     authService.createUser(email: email, password: password, role: role) { result in
                         switch result {
                         case .success:
-                            authService.signOut()
+                            onUserCreated?()
                             presentationMode.wrappedValue.dismiss()
                         case .failure(let error):
                             showErrorAlert = true
@@ -58,7 +59,6 @@ struct AddUserView: View {
         }
     }
 }
-
 struct AddUserView_Previews: PreviewProvider {
     static var previews: some View {
         AddUserView()
