@@ -10,15 +10,17 @@ import SwiftUI
 struct ContentView: View {
     
     @EnvironmentObject var authService: AuthService
+    @StateObject var taskService = TaskService() // добавьте эту строку
+
 
         var body: some View {
             Group {
                 if let userRole = authService.currentUserRole {
                     switch userRole {
                     case .manager:
-                        ManagerView()
+                        ManagerView().environmentObject(taskService)
                     case .executer:
-                        EmployeeView()
+                        EmployeeView().environmentObject(taskService)
                     }
                 } else {
                     LoginView()

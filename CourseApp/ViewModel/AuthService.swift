@@ -84,7 +84,8 @@ class AuthService: ObservableObject {
             }
             
             let userData: [String: Any] = [
-                "role": role.rawValue
+                "role": role.rawValue,
+                "email": email // добавьте это поле
             ]
             
             self?.db.collection("users").document(uid).setData(userData) { error in
@@ -96,19 +97,21 @@ class AuthService: ObservableObject {
                 }
             }
         }
-        
-        
-        
-        
-        func signOut() {
-            do {
-                try Auth.auth().signOut()
-                currentUserRole = nil
-            } catch let error {
-                print("Error signing out: \(error.localizedDescription)")
-            }
+    }
+    
+    
+    
+    
+    
+    func signOut() {
+        do {
+            try Auth.auth().signOut()
+            currentUserRole = nil
+        } catch let error {
+            print("Error signing out: \(error.localizedDescription)")
         }
-        
     }
     
 }
+
+

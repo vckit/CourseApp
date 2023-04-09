@@ -14,4 +14,6 @@ struct Task: Identifiable {
     let description: String
     let status: TaskStatus
     let dueDate: Date
+    let executorId: String
 }
+

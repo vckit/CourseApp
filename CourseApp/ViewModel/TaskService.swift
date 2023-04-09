@@ -11,13 +11,15 @@ import FirebaseFirestore
 
 class TaskService: ObservableObject {
     private let db = Firestore.firestore()
+    @Published var executors: [User] = []
     
-    func addTask(title: String, description: String, dueDate: Date, completion: @escaping (Result<Void, Error>) -> Void) {
+    func addTask(title: String, description: String, dueDate: Date, executorId: String, completion: @escaping (Result<Void, Error>) -> Void) {
         let taskData: [String: Any] = [
             "title": title,
             "description": description,
             "status": TaskStatus.active.rawValue,
-            "dueDate": dueDate
+            "dueDate": dueDate,
+            "executorId": executorId
         ]
         
         db.collection("tasks").addDocument(data: taskData) { error in
@@ -28,6 +30,7 @@ class TaskService: ObservableObject {
             }
         }
     }
+    
     
     func updateTask(task: Task, completion: @escaping (Result<Void, Error>) -> Void) {
         let taskData: [String: Any] = [
@@ -55,6 +58,32 @@ class TaskService: ObservableObject {
             }
         }
     }
+    
+    func fetchExecutors() {
+        db.collection("users").whereField("role", isEqualTo: UserRole.executer.rawValue).getDocuments { [self] querySnapshot, error in
+            if let error = error {
+                print("Error fetching executors: \(error.localizedDescription)")
+                return
+            }
+            
+            guard let documents = querySnapshot?.documents else {
+                print("Error fetching executors: No documents found")
+                return
+            }
+            
+            executors = documents.compactMap { document in
+                guard let email = document.data()["email"] as? String else {
+                    print("Error fetching executors: Missing or invalid email field")
+                    return nil
+                }
+                
+                return User(id: document.documentID, email: email, role: .executer)
+            }
+        }
+    }
+    
+    
+    
     
     func updateOverdueTasks() {
         let now = Date()

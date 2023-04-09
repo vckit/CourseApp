@@ -10,6 +10,7 @@ import SwiftUI
 struct ManagerView: View {
     @State private var showAddUserView = false
     
+    @EnvironmentObject var taskService: TaskService
     
     var body: some View {
         NavigationView {
@@ -22,7 +23,7 @@ struct ManagerView: View {
                         .foregroundColor(.white)
                         .cornerRadius(8)
                 }
-                
+                .environmentObject(taskService)
                 Button(action: {
                     showAddUserView = true
                 }) {

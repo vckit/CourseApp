@@ -36,9 +36,4 @@ struct TaskDetailView: View {
     }
 }
 
-struct TaskDetailView_Previews: PreviewProvider {
-    static var previews: some View {
-        TaskDetailView(task: Task(id: "1", title: "Test Task", description: "This is a test task", status: .active, dueDate: Date()))
-    }
-}
 
