@@ -12,7 +12,7 @@ struct Task: Identifiable {
     let id: String
     let title: String
     let description: String
-    let status: TaskStatus
+    var status: TaskStatus
     let dueDate: Date
     let executorId: String
 }

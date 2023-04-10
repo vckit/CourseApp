@@ -15,6 +15,31 @@ class TaskService: ObservableObject {
     private let db = Firestore.firestore()
     @Published var executors: [User] = []
     
+    func getTasksAssignedToUser(userId: String, completion: @escaping (Result<[Task], Error>) -> Void) {
+        db.collection("tasks")
+            .whereField("executorId", isEqualTo: userId)
+            .getDocuments { (querySnapshot, error) in
+                if let error = error {
+                    completion(.failure(error))
+                } else {
+                    let tasks = querySnapshot?.documents.compactMap { document -> Task? in
+                        let data = document.data()
+                        return Task(
+                            id: document.documentID,
+                            title: data["title"] as? String ?? "",
+                            description: data["description"] as? String ?? "",
+                            status: TaskStatus(rawValue: data["status"] as? String ?? "") ?? .unassigned,
+                            dueDate: data["dueDate"] as? Date ?? Date(),
+                            executorId: data["executorId"] as? String ?? ""
+                        )
+                    } ?? []
+                    
+                    completion(.success(tasks))
+                }
+            }
+    }
+
+    
     func addTask(title: String, description: String, dueDate: Date, executorId: String, completion: @escaping (Result<Void, Error>) -> Void) {
         let taskData: [String: Any] = [
             "title": title,

@@ -13,6 +13,16 @@ class AuthService: ObservableObject {
     @Published var currentUserRole: UserRole?
     private let db = Firestore.firestore()
     
+    var currentUser: User? {
+        guard let firebaseUser = Auth.auth().currentUser,
+              let currentRole = currentUserRole else {
+            return nil
+        }
+        return User(id: firebaseUser.uid, email: firebaseUser.email ?? "", role: currentRole)
+    }
+
+
+    
     func signIn(email: String, password: String, completion: @escaping (Result<Void, Error>) -> Void) {
         Auth.auth().signIn(withEmail: email, password: password) { [weak self] result, error in
             if let error = error {

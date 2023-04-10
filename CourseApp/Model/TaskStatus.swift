@@ -9,6 +9,7 @@ import Foundation
 
 
 enum TaskStatus: String, CaseIterable, Identifiable {
+    case unassigned = "unassigned"
     case active = "active"
     case completed = "completed"
     case overdue = "overdue"
