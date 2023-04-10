@@ -10,16 +10,28 @@ import Firebase
 
 struct TaskListView: View {
     @State private var tasks: [Task] = []
-    
+
     @EnvironmentObject var taskService: TaskService
-    @State private var showAddTaskView = false
-    @State private var selectedTask: Task?
-    
+    @State private var activeSheet: ActiveSheet?
+
+    enum ActiveSheet: Identifiable {
+        case addTask, taskDetail(Task)
+
+        var id: Int {
+            switch self {
+            case .addTask:
+                return 1
+            case .taskDetail:
+                return 2
+            }
+        }
+    }
+
     var body: some View {
         NavigationView {
             List(taskService.tasks) { task in
                 Button(action: {
-                    selectedTask = task
+                    activeSheet = .taskDetail(task)
                 }) {
                     TaskRow(task: task)
                 }
@@ -28,26 +40,29 @@ struct TaskListView: View {
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button(action: {
-                        showAddTaskView = true
+                        activeSheet = .addTask
                     }) {
                         Image(systemName: "plus")
                     }
                 }
             }
-            .sheet(isPresented: $showAddTaskView) {
-                AddTaskView { task in
-                    tasks.append(task)
-                    showAddTaskView = false
+            .sheet(item: $activeSheet) { item in
+                switch item {
+                case .addTask:
+                    AddTaskView { task in
+                        tasks.append(task)
+                        activeSheet = nil
+                    }
+                case .taskDetail(let task):
+                    TaskDetailView(task: task).environmentObject(taskService)
                 }
             }
-            .sheet(item: $selectedTask) { task in
-                TaskDetailView(task: task).environmentObject(taskService)
-            }
-        }.onAppear{
+        }.onAppear {
             taskService.fetchTasks()
         }
     }
 }
+
 
 
 struct TaskRow: View {

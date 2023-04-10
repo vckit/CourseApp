@@ -11,20 +11,23 @@ struct EmployeeView: View {
     @EnvironmentObject var taskService: TaskService
     @EnvironmentObject var authService: AuthService
     
-    @State private var tasks: [Task] = []
+    private var filteredTasks: [Task] {
+        taskService.tasks.filter { $0.status == .active }
+    }
+    
     
     func fetchAssignedTasks() {
-        guard let userId = authService.currentUser?.id else { return }
-        
-        fetchTasksAssignedToUser(userId: userId) { result in
-            switch result {
-            case .success(let fetchedTasks):
-                tasks = fetchedTasks
-            case .failure(let error):
-                print("Error fetching tasks for executer: \(error.localizedDescription)")
+            guard let userId = authService.currentUser?.id else { return }
+            
+            fetchTasksAssignedToUser(userId: userId) { result in
+                switch result {
+                case .success(let fetchedTasks):
+                    taskService.tasks = fetchedTasks
+                case .failure(let error):
+                    print("Error fetching tasks for executer: \(error.localizedDescription)")
+                }
             }
         }
-    }
     
     func fetchTasksAssignedToUser(userId: String, completion: @escaping (Result<[Task], Error>) -> Void) {
         taskService.getTasksAssignedToUser(userId: userId, completion: completion)
@@ -34,20 +37,20 @@ struct EmployeeView: View {
     func updateTaskStatus(task: Task, newStatus: TaskStatus) {
         let updatedTask = Task(id: task.id, title: task.title, description: task.description, status: newStatus, dueDate: task.dueDate, executorId: task.executorId)
         
-        
         taskService.updateTask(task: updatedTask) { result in
             switch result {
             case .success:
-                tasks.removeAll { $0.id == task.id }
+                taskService.tasks.removeAll { $0.id == task.id }
             case .failure(let error):
                 print("Error updating task status: \(error.localizedDescription)")
             }
         }
     }
+
     
     var body: some View {
         NavigationView {
-            List(tasks) { task in
+            List(filteredTasks) { task in
                 NavigationLink(destination: TaskDetailViewExecuter(task: task)) {
                     VStack(alignment: .leading, spacing: 8) {
                         Text(task.title).font(.headline)

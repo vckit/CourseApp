@@ -77,13 +77,16 @@ struct TaskDetailView: View {
                 DatePicker("Due Date", selection: $dueDate, displayedComponents: .date)
             }
             
+            Section{
+                Button("Save task", action: saveTask)
+                    .foregroundColor(.blue)
+            }
             Section {
                 Button("Delete Task", action: deleteTask)
                     .foregroundColor(.red)
             }
         }
         .navigationTitle("Task Detail")
-        .navigationBarItems(trailing: Button("Save", action: saveTask))
         
         .onAppear {
             loadExecutor()
