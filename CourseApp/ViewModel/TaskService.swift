@@ -39,10 +39,11 @@ class TaskService: ObservableObject {
             "title": task.title,
             "description": task.description,
             "status": task.status.rawValue,
-            "dueDate": task.dueDate
+            "dueDate": Timestamp(date: task.dueDate),
+            "executorId": task.executorId
         ]
-        
-        db.collection("tasks").document(task.id).setData(taskData) { error in
+
+        db.collection("tasks").document(task.id).updateData(taskData) { error in
             if let error = error {
                 completion(.failure(error))
             } else {
@@ -50,6 +51,7 @@ class TaskService: ObservableObject {
             }
         }
     }
+
     
     func deleteTask(task: Task, completion: @escaping (Result<Void, Error>) -> Void) {
         db.collection("tasks").document(task.id).delete { error in
@@ -168,9 +170,6 @@ class TaskService: ObservableObject {
         }
     }
 
-
-
-    
     
     func updateOverdueTasks() {
         let now = Date()

@@ -10,13 +10,17 @@ import Firebase
 
 struct TaskListView: View {
     @State private var tasks: [Task] = []
+    
     @EnvironmentObject var taskService: TaskService
     @State private var showAddTaskView = false
+    @State private var selectedTask: Task?
     
     var body: some View {
         NavigationView {
             List(taskService.tasks) { task in
-                NavigationLink(destination: TaskDetailView(task: task)) {
+                Button(action: {
+                    selectedTask = task
+                }) {
                     TaskRow(task: task)
                 }
             }
@@ -36,6 +40,9 @@ struct TaskListView: View {
                     showAddTaskView = false
                 }
             }
+            .sheet(item: $selectedTask) { task in
+                TaskDetailView(task: task).environmentObject(taskService)
+            }
         }.onAppear{
             taskService.fetchTasks()
         }
@@ -50,7 +57,6 @@ struct TaskRow: View {
         VStack(alignment: .leading, spacing: 8) {
             Text(task.title).font(.headline)
             Text(task.description).font(.subheadline).foregroundColor(.gray)
-            
         }
     }
 }

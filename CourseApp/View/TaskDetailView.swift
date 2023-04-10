@@ -27,16 +27,28 @@ struct TaskDetailView: View {
         self._executor = State(initialValue: nil)
     }
     
-    func deleteTask() {
-            taskService.deleteTask(taskId: task.id) { result in
-                switch result {
-                case .success:
-                    presentationMode.wrappedValue.dismiss()
-                case .failure(let error):
-                    print("Error deleting task: \(error.localizedDescription)")
-                }
+    func saveTask() {
+        let updatedTask = Task(id: task.id, title: title, description: description, status: status, dueDate: dueDate, executorId: task.executorId)
+        taskService.updateTask(task: updatedTask) { result in
+            switch result {
+            case .success:
+                presentationMode.wrappedValue.dismiss()
+            case .failure(let error):
+                print("Error updating task: \(error.localizedDescription)")
             }
         }
+    }
+    
+    func deleteTask() {
+        taskService.deleteTask(taskId: task.id) { result in
+            switch result {
+            case .success:
+                presentationMode.wrappedValue.dismiss()
+            case .failure(let error):
+                print("Error deleting task: \(error.localizedDescription)")
+            }
+        }
+    }
     
     var body: some View {
         Form {
@@ -71,6 +83,8 @@ struct TaskDetailView: View {
             }
         }
         .navigationTitle("Task Detail")
+        .navigationBarItems(trailing: Button("Save", action: saveTask))
+        
         .onAppear {
             loadExecutor()
         }
