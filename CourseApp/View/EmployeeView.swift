@@ -12,8 +12,14 @@ struct EmployeeView: View {
     @EnvironmentObject var authService: AuthService
     
     private var filteredTasks: [Task] {
-        taskService.tasks.filter { $0.status == .active }
+        taskService.tasks.filter { task in
+            if let currentUser = authService.currentUser, task.executorId == currentUser.id {
+                return task.status == .active
+            }
+            return false
+        }
     }
+
     
     
     func fetchAssignedTasks() {
