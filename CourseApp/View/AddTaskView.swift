@@ -34,7 +34,7 @@ struct AddTaskView: View {
                 
                 Picker("Executor", selection: $selectedExecutor) {
                     ForEach(taskService.executors, id: \.id) { executor in
-                        Text(executor.email).tag(Optional(executor)) // Используйте 'Optional(executor)' вместо 'executor'
+                        Text(executor.email).tag(Optional(executor))
                     }
                 }
                 

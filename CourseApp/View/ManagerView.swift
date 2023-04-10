@@ -9,7 +9,7 @@ import SwiftUI
 
 struct ManagerView: View {
     @State private var showAddUserView = false
-    
+    @EnvironmentObject var authService: AuthService
     @EnvironmentObject var taskService: TaskService
     
     var body: some View {
@@ -43,6 +43,15 @@ struct ManagerView: View {
             }
             .padding()
             .navigationTitle("Manager View")
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button(action: {
+                        authService.signOut()
+                    }) {
+                        Image(systemName: "person.crop.circle.badge.xmark")
+                    }
+                }
+            }
         }
     }
 }
