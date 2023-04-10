@@ -9,14 +9,34 @@ import SwiftUI
 
 struct TaskDetailView: View {
     let task: Task
+    @EnvironmentObject var taskService: TaskService
     @State private var title: String
     @State private var description: String
+    @State private var status: TaskStatus
+    @State private var executor: User?
+    @State private var dueDate: Date
+    
+    @Environment(\.presentationMode) var presentationMode
     
     init(task: Task) {
         self.task = task
         self._title = State(initialValue: task.title)
         self._description = State(initialValue: task.description)
+        self._status = State(initialValue: task.status)
+        self._dueDate = State(initialValue: task.dueDate)
+        self._executor = State(initialValue: nil)
     }
+    
+    func deleteTask() {
+            taskService.deleteTask(taskId: task.id) { result in
+                switch result {
+                case .success:
+                    presentationMode.wrappedValue.dismiss()
+                case .failure(let error):
+                    print("Error deleting task: \(error.localizedDescription)")
+                }
+            }
+        }
     
     var body: some View {
         Form {
@@ -25,15 +45,46 @@ struct TaskDetailView: View {
                 TextField("Description", text: $description)
             }
             
+            Section(header: Text("Status")) {
+                Picker("Status", selection: $status) {
+                    ForEach(TaskStatus.allCases, id: \.self) { status in
+                        Text(status.rawValue.capitalized).tag(status)
+                    }
+                }
+            }
+            
+            Section(header: Text("Executor")) {
+                if let executor = executor {
+                    Text(executor.email)
+                } else {
+                    Text("Loading...")
+                }
+            }
+            
+            Section(header: Text("Due Date")) {
+                DatePicker("Due Date", selection: $dueDate, displayedComponents: .date)
+            }
+            
             Section {
-                Button("Delete Task", action: {
-                    // Удалите задачу здесь
-                })
-                .foregroundColor(.red)
+                Button("Delete Task", action: deleteTask)
+                    .foregroundColor(.red)
             }
         }
         .navigationTitle("Task Detail")
+        .onAppear {
+            loadExecutor()
+        }
     }
+    
+    func loadExecutor() {
+        taskService.fetchUserById(userId: task.executorId) { result in
+            switch result {
+            case .success(let user):
+                executor = user
+            case .failure(let error):
+                print("Error loading executor: \(error.localizedDescription)")
+            }
+        }
+    }
+    
 }
-
-

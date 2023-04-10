@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import Firebase
 import FirebaseFirestore
 
 let db = Firestore.firestore()
@@ -33,10 +34,9 @@ struct AddTaskView: View {
                 
                 Picker("Executor", selection: $selectedExecutor) {
                     ForEach(taskService.executors, id: \.id) { executor in
-                        Text(executor.email).tag(executor)
+                        Text(executor.email).tag(Optional(executor)) // Используйте 'Optional(executor)' вместо 'executor'
                     }
                 }
-                .pickerStyle(WheelPickerStyle())
                 
                 
                 Button("Add Task") {
@@ -48,6 +48,7 @@ struct AddTaskView: View {
                     }
                     
                     let task = Task(id: UUID().uuidString, title: title, description: description, status: .active, dueDate: dueDate, executorId: selectedExecutor.id)
+                    taskService.addTaskToFirestore(task: task)
                     onTaskAdded?(task)
                     presentationMode.wrappedValue.dismiss()
                 }
@@ -65,33 +66,9 @@ struct AddTaskView: View {
             }
         }
         .onAppear {
-            fetchExecutors()
+            taskService.fetchExecutors()
         }
     }
-    
-    private func fetchExecutors() {
-        db.collection("users").whereField("role", isEqualTo: UserRole.executer.rawValue).getDocuments { [self] querySnapshot, error in
-            if let error = error {
-                print("Error fetching executors: \(error.localizedDescription)")
-                return
-            }
-            
-            guard let documents = querySnapshot?.documents else {
-                print("Error fetching executors: No documents found")
-                return
-            }
-            
-            executors = documents.compactMap { document in
-                guard let email = document.data()["email"] as? String else {
-                    print("Error fetching executors: Missing or invalid email field")
-                    return nil
-                }
-                
-                return User(id: document.documentID, email: email, role: .executer)
-            }
-        }
-    }
-    
     
     struct AddTaskView_Previews: PreviewProvider {
         static var previews: some View {

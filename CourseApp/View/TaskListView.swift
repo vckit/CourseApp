@@ -6,14 +6,16 @@
 //
 
 import SwiftUI
+import Firebase
 
 struct TaskListView: View {
     @State private var tasks: [Task] = []
+    @EnvironmentObject var taskService: TaskService
     @State private var showAddTaskView = false
     
     var body: some View {
         NavigationView {
-            List(tasks) { task in
+            List(taskService.tasks) { task in
                 NavigationLink(destination: TaskDetailView(task: task)) {
                     TaskRow(task: task)
                 }
@@ -34,6 +36,8 @@ struct TaskListView: View {
                     showAddTaskView = false
                 }
             }
+        }.onAppear{
+            taskService.fetchTasks()
         }
     }
 }
@@ -46,6 +50,7 @@ struct TaskRow: View {
         VStack(alignment: .leading, spacing: 8) {
             Text(task.title).font(.headline)
             Text(task.description).font(.subheadline).foregroundColor(.gray)
+            
         }
     }
 }

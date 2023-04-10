@@ -17,12 +17,22 @@ struct LoginView: View {
     
     var body: some View {
         VStack {
-            Image(systemName: "lock")
-                .resizable()
-                .scaledToFit()
-                .frame(width: 150, height: 150)
-                .padding(.bottom, 24)
-
+            VStack(spacing: 16) {
+                Image("palestina")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 100, height: 100)
+                
+                Text("We stand with Palestina")
+                    .fontWeight(.bold)
+                    .multilineTextAlignment(.center)
+                
+            }
+            .padding()
+            
+            Text("Design Studio")
+                .multilineTextAlignment(.center)
+                .font(.title)
             
             TextField("Email", text: $email)
                 .autocapitalization(.none)
@@ -35,6 +45,7 @@ struct LoginView: View {
                 .padding()
                 .background(Color(.systemGray6))
                 .cornerRadius(8)
+                .padding(.bottom)
             
             Button("Sign In") {
                 authService.signIn(email: email, password: password) { result in
@@ -46,10 +57,13 @@ struct LoginView: View {
                     }
                 }
             }
-            .padding()
-            .background(Color.black)
+            .font(.headline)
             .foregroundColor(.white)
+            .padding()
+            .frame(maxWidth: .infinity)
+            .background(Color.gray)
             .cornerRadius(10)
+            .padding(.horizontal)
         }
         .padding()
         .alert(isPresented: $showErrorAlert) {
@@ -58,8 +72,10 @@ struct LoginView: View {
     }
 }
 
+
 struct LoginView_Previews: PreviewProvider {
     static var previews: some View {
         LoginView()
     }
 }
+
