@@ -11,17 +11,15 @@ import FirebaseAuth
 
 @main
 struct CourseAppApp: App {
-    
+    @EnvironmentObject var taskService: TaskService
     init() {
         FirebaseApp.configure()
-        //updateOverdueTasks()
     }
     
     var body: some Scene {
         WindowGroup {
             ContentView()
                 .environmentObject(AuthService())
-                //.environmentObject(TaskService)
         }
     }
 }
